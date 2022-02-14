@@ -1,0 +1,30 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+    name: Test
+    runs-on: macos-latest
+    strategy:
+        matrix:
+            destination: ['platform=iOS Simulator,OS=15.2,name=iPhone 12 Pro Max']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build
+        run: |
+          xcodebuild clean build -project CICD.xcodeproj -scheme CICD -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        env:
+          destination: ${{ matrix.destination }}
+      - name: Test
+        run: |
+          xcodebuild clean test -project CICD.xcodeproj -scheme CICD -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        env: 
+         destination: ${{ matrix.destination }}
